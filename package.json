@@ -1,0 +1,28 @@
+{
+  "name": "semana-jsexpert-6",
+  "version": "1.0.0",
+  "description": "Seja bem vindo(a) à sexta Semana Javascript Expert.",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server/index.js",
+    "live-reload": "nodemon server/index.js",
+    "test": "set NODE_OPTIONS=--experimental-vm-modules && npx jest --no-cahe --runInBand",
+    "test:watch": "set LOG_DISABLED=true && set NODE_OPTIONS=--experimental-vm-modules && npx jest --no-cahe --runInBand --watchAll",
+    "test:coverage": "set NODE_OPTIONS=--experimental-vm-modules && npx jest --no-cahe --runInBand --coverage tests/unit"
+  },
+  "engines": {
+    "node": "17"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "jest": "^27.5.1",
+    "nodemon": "^2.0.15"
+  },
+  "dependencies": {
+    "pino": "^7.8.0",
+    "pino-pretty": "^7.5.3"
+  }
+}
