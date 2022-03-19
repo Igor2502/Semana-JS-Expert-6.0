@@ -1,6 +1,6 @@
 import fs from 'fs'
 import fsPromises from 'fs/promises'
-import { extname, join } from 'path'
+import path, { extname, join } from 'path'
 import { randomUUID } from 'crypto'
 import { PassThrough, Writable } from 'stream'
 import Throttle from 'throttle'
@@ -115,5 +115,64 @@ export class Service {
       stream: this.createFileStream(name),
       type
     }
+  }
+
+  async readFxByName(fxName) {
+    const songs = await fsPromises.readdir(config.dir.fxDirectory)
+    const chosenSong = songs.find(filename => filename.toLowerCase().includes(fxName))
+    if (!chosenSong) return Promise.reject(`the song ${fxName} wasn't found!`)
+
+    return path.join(config.dir.fxDirectory, chosenSong)
+  }
+
+  appendFxStream(fx) {
+    const throttleTransformable = new Throttle(this.currentBitRate)
+    streamsPromises.pipeline(
+      throttleTransformable,
+      this.broadCast()
+    )
+
+    const unpipe = () => {
+      const transformStream = this.mergeAudioStreams(fx, this.currentReadable)
+      this.throttleTransform = throttleTransformable,
+      this.currentReadable = transformStream
+      this.currentReadable.removeListener('unpipe', unpipe)
+
+      streamsPromises.pipeline(
+        transformStream,
+        throttleTransformable
+      )
+    }
+    this.throttleTransform.on('unpipe', unpipe)
+    this.throttleTransform.pause()
+    this.currentReadable.unpipe(this.throttleTransform)
+  }
+
+  mergeAudioStreams(song, readable) {
+    const transformStream = PassThrough()
+    const args = [
+      '-t', config.constants.audioMediaType,
+      '-v', config.constants.songVolume,
+      '-m', '-',
+      '-t', config.constants.audioMediaType,
+      '-v', config.constants.fxVolume,
+      song,
+      '-t', config.constants.audioMediaType,
+      '-'
+    ]
+
+    const { stdout, stdin } = this._executeSoxCommand(args)
+
+    streamsPromises.pipeline(
+      readable,
+      stdin
+    )
+
+    streamsPromises.pipeline(
+      stdout,
+      transformStream
+    )
+
+    return transformStream
   }
 }
