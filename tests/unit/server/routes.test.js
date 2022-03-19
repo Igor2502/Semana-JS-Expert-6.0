@@ -46,6 +46,38 @@ describe('#Routes - test suit for api response', () => {
     expect(mockFileStream.pipe).toHaveBeenCalledWith(params.response)
   })
 
+  test(`GET /stream?id=123 - should response with a new client stream`, async () => {
+    const params = TestUtil.defaultHandleParams()
+    params.request.method = 'GET'
+    params.request.url = '/stream'
+
+    const stream = TestUtil.generateReadableStream(['test'])
+    const onClose = jest.fn()
+
+    jest.spyOn(
+      stream,
+      'pipe'
+    ).mockReturnValue()
+    jest.spyOn(
+      Controller.prototype,
+      Controller.prototype.createClientStream.name
+    ).mockReturnValue({
+      stream,
+      onClose
+    })
+
+    await handler(...params.values())
+    params.request.emit('close')
+
+    expect(params.response.writeHead).toHaveBeenCalledWith(200, {
+      'Content-Type': 'audio/mpeg',
+      'Accept-Ranges': 'bytes',
+    })
+    expect(Controller.prototype.createClientStream).toHaveBeenCalled()
+    expect(stream.pipe).toHaveBeenCalledWith(params.response)
+    expect(onClose).toHaveBeenCalled()
+  })
+
   test(`GET /controller - should response with ${config.pages.controllerHTML} file stream`, async () => {
     const params = TestUtil.defaultHandleParams()
     params.request.method = 'GET'
@@ -67,6 +99,27 @@ describe('#Routes - test suit for api response', () => {
     await handler(...params.values())
     expect(Controller.prototype.getFileStream).toHaveBeenCalledWith(config.pages.controllerHTML)
     expect(mockFileStream.pipe).toHaveBeenCalledWith(params.response)
+  })
+
+  test(`POST /controller - should send a command to execute at sox`, async () => {
+    const params = TestUtil.defaultHandleParams()
+    params.request.method = 'POST'
+    params.request.url = '/controller'
+    params.request.push(JSON.stringify(
+      {
+        'command': 'start'
+      }
+    ))
+
+    jest.spyOn(
+      Controller.prototype,
+      Controller.prototype.handleCommand.name,
+    ).mockResolvedValue({
+      result: 'ok'
+    })
+
+    await handler(...params.values())
+    expect(Controller.prototype.handleCommand).toHaveBeenCalledWith({ command: 'start' })
   })
 
   test(`GET /index.html - should response with file stream`, async () => {
@@ -136,7 +189,7 @@ describe('#Routes - test suit for api response', () => {
   })
 
   describe('exceptions', () => {
-    test('given inixistent file it should respond with 404', async () => {
+    test('given inexistent file it should respond with 404', async () => {
       const params = TestUtil.defaultHandleParams()
       params.request.method = 'GET'
       params.request.url = '/index.png'
@@ -150,7 +203,7 @@ describe('#Routes - test suit for api response', () => {
       expect(params.response.writeHead).toHaveBeenCalledWith(404)
       expect(params.response.end).toHaveBeenCalled()
     })
-    test('given ian error it should respond with 500', async () => {
+    test('given an error it should respond with 500', async () => {
       const params = TestUtil.defaultHandleParams()
       params.request.method = 'GET'
       params.request.url = '/index.png'

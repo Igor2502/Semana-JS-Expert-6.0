@@ -17,8 +17,8 @@ export default {
     fxDirectory: join(audioDirectory, 'fx')
   },
   pages: {
-    homeHTML:  'home/index.html',
-    controllerHTML:  'controller/index.html'
+    homeHTML: 'home/index.html',
+    controllerHTML: 'controller/index.html'
   },
   location: {
     home: '/home'
@@ -28,7 +28,7 @@ export default {
       '.html': 'text/html',
       '.css': 'text/css',
       '.js': 'text/javascript',
-    },
+    }, 
     audioMediaType: 'mp3',
     songVolume: '0.99',
     fallbackBitRate: '128000',

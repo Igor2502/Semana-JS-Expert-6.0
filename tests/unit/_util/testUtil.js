@@ -15,7 +15,7 @@ export default class TestUtil {
     })
   }
 
-  static generateWriteableStream(onData) {
+  static generateWritableStream(onData) {
     return new Writable({
       write(chunk, enc, cb) {
         onData(chunk)
@@ -27,7 +27,7 @@ export default class TestUtil {
 
   static defaultHandleParams() {
     const requestStream = TestUtil.generateReadableStream(['body da requisição'])
-    const response = TestUtil.generateWriteableStream(() => {})
+    const response = TestUtil.generateWritableStream(() => {})
     const data = {
       request: Object.assign(requestStream, {
         headers: {},
@@ -45,4 +45,14 @@ export default class TestUtil {
       ...data
     }
   }
+
+  static getSpawnResponse = ({
+    stdout = '',
+    stderr = '',
+    stdin = () => {}
+  }) => ({
+    stdout: this.generateReadableStream([stdout]),
+    stderr: this.generateReadableStream([stderr]),
+    stdin: this.generateWritableStream(stdin),
+  })
 }
