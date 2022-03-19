@@ -6,6 +6,7 @@ import config from '../../../server/config.js'
 
 import fs from 'fs'
 import fsPromises from 'fs/promises'
+import os from 'os'
 
 describe('#Service - test suit for services', () => {
   beforeAll(() => {
@@ -42,7 +43,7 @@ describe('#Service - test suit for services', () => {
 
     const expectedValue = {
       type: '.png',
-      name: `${config.dir.publicDirectory}\\${mockFile}`
+      name: `${config.dir.publicDirectory}${os.type().includes('Linux') ? '/' : '\\'}${mockFile}`
     }
 
     expect(type).toEqual(expectedValue.type)

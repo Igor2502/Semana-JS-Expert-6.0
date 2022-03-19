@@ -6,10 +6,20 @@
   "type": "module",
   "scripts": {
     "start": "node server/index.js",
-    "live-reload": "nodemon server/index.js",
-    "test": "set LOG_DISABLED=true && set NODE_OPTIONS=--experimental-vm-modules && npx jest --no-cahe --runInBand",
-    "test:watch": "set LOG_DISABLED=true && set NODE_OPTIONS=--experimental-vm-modules && npx jest --no-cahe --runInBand --watchAll",
-    "test:coverage": "set LOG_DISABLED=true && set NODE_OPTIONS=--experimental-vm-modules && npx jest --no-cahe --runInBand --coverage tests/unit"
+    "live-reload": "nodemon -L server/index.js",
+    "test": "set LOG_DISABLED=true && set NODE_OPTIONS=--experimental-vm-modules --no-warnings && npx jest --no-cahe --runInBand",
+    "test:watch": "set LOG_DISABLED=true && set NODE_OPTIONS=--experimental-vm-modules --no-warnings && npx jest --no-cahe --runInBand --watchAll",
+    "test:coverage": "set LOG_DISABLED=true && set NODE_OPTIONS=--experimental-vm-modules --no-warnings && npx jest --no-cahe --runInBand --coverage tests/unit",
+    "test:e2e": "set LOG_DISABLED=true && set NODE_OPTIONS=--experimental-vm-modules --no-warnings && npx jest --no-cahe --runInBand tests/e2e",
+    
+    "test-linux": "LOG_DISABLED=true NODE_OPTIONS='--experimental-vm-modules --no-warnings' jest --no-cache",
+    "test-watch-linux": "LOG_DISABLED=true NODE_OPTIONS='--experimental-vm-modules --no-warnings' jest --no-cache --watchAll",
+    "test-coverage-linux": "LOG_DISABLED=true NODE_OPTIONS='--experimental-vm-modules --no-warnings' jest --no-cache --watchAll --coverage tests/unit",
+    
+    "live-reload:docker": "docker-compose up --build live-reload",
+    "test:docker": "docker-compose up --build test-linux",
+    "test:watch:docker": "docker-compose up --build test-watch-linux",
+    "test:coverage:docker": "docker-compose up --build test-coverage-linux"
   },
   "engines": {
     "node": "17"
@@ -19,10 +29,13 @@
   "license": "ISC",
   "devDependencies": {
     "jest": "^27.5.1",
-    "nodemon": "^2.0.15"
+    "nodemon": "^2.0.15",
+    "portfinder": "^1.0.28",
+    "supertest": "^6.2.2"
   },
   "dependencies": {
     "pino": "^7.8.0",
-    "pino-pretty": "^7.5.3"
+    "pino-pretty": "^7.5.3",
+    "throttle": "^1.0.3"
   }
 }
