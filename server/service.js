@@ -119,7 +119,7 @@ export class Service {
 
   async readFxByName(fxName) {
     const songs = await fsPromises.readdir(config.dir.fxDirectory)
-    const chosenSong = songs.find(filename => filename.toLowerCase().includes(fxName))
+    const chosenSong = songs.find(filename => filename.toLowerCase().includes(fxName.toLowerCase()))
     if (!chosenSong) return Promise.reject(`the song ${fxName} wasn't found!`)
 
     return path.join(config.dir.fxDirectory, chosenSong)
@@ -134,7 +134,7 @@ export class Service {
 
     const unpipe = () => {
       const transformStream = this.mergeAudioStreams(fx, this.currentReadable)
-      this.throttleTransform = throttleTransformable,
+      this.throttleTransform = throttleTransformable
       this.currentReadable = transformStream
       this.currentReadable.removeListener('unpipe', unpipe)
 
